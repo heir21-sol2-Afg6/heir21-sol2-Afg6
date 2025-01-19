@@ -1,0 +1,65 @@
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+
+r = 1
+rng = np.random.default_rng()
+
+N = 100000
+print("Численное моделирование средней длины хорд, число испытаний N =", N)
+
+start_time = time.time()
+
+phi = rng.random(N)*2*np.pi
+rho = (rng.random(N)*r)**0.5 #квадратный корень! функция, обратная CDF (cumulative distribution function)
+x, y = rho * np.cos(phi), rho * np.sin(phi)
+
+chord_l1 = 2 * (r*r - x*x - y*y)**0.5
+
+end_time = time.time()
+
+print(f"Время выполнения 1: {-start_time + end_time} секунд")
+
+fig, axes = plt.subplots(1, 2)
+axes[0].set(aspect = 1)
+axes[0].plot(x[::100], y[::100], 'og', label='Зеленые точки - метод «случайного центра»')
+
+start_time = time.time()
+
+phi = rng.random(N)*2*np.pi
+rho = rng.random(N)*r
+x, y = rho * np.cos(phi), rho * np.sin(phi)
+
+
+chord_l1_1 = 2 * (r*r - x*x - y*y)**0.5
+
+end_time = time.time()
+
+print(f"Время выполнения 2: {-start_time + end_time} секунд")
+
+axes[0].plot(x[::100], y[::100], 'or', label='Красные точки - метод «случайного радиуса»')
+axes[0].set_title('Зеленые точки - метод «случайного центра»\nКрасные точки - метод «случайного радиуса»\nИзображена каждая сотая точка центров хорд')
+
+start_time = time.time()
+
+phi = rng.random(N)*2*np.pi
+x1, y1 = r * np.cos(phi), r * np.sin(phi)
+phi = rng.random(N)*2*np.pi
+x2, y2 = r * np.cos(phi), r * np.sin(phi)
+
+
+chord_l2 = ((x2-x1)**2 + (y2-y1)**2) ** 0.5
+
+end_time = time.time()
+
+print(f"Время выполнения 3: {-start_time + end_time} секунд")
+
+print('average l1 =', np.average(chord_l1))
+print('average l1_1 =', np.average(chord_l1_1))
+print('average l2 =', np.average(chord_l2))
+
+axes[1].set(aspect = 1)
+axes[1].plot([x1[::1000], x2[::1000]], [y1[::1000], y2[::1000]],'o-')
+axes[1].set_title('Метод «случайных концов», изображена только каждая тысячная хорда')
+fig.suptitle('Случайные хорды, парадокс Бертрана')
+plt.show()
